@@ -48,4 +48,41 @@ system.time({
 system.time({
   mm_data = mm_read(directory, pattern = "RoadLink", n_files = Inf) # 100% of GB files
 })
+ #  user  system elapsed 
+ # 789.44    5.51  859.64 
+saveRDS(mm_data, "mm_data_RoadLink.Rds")
+ # user  system elapsed 
+ # 140.50    1.06  142.11 
+coltypes = sapply(mm_data, class)
+cols_remove = which(coltypes == "list")
+mm_data_chars = mm_data[-cols_remove]
+system.time({
+  sf::write_sf(mm_data_chars, "C:/Users/RLOVELAC/data/os/mm_data_RoadLink.gpkg")
+})
+# sample_area = sf::read_sf("sample-area.geojson")
+file.copy("C:/Users/RLOVELAC/Downloads/Boundary (1).geojson", "st_georges_cycle.geojson")
+sample_area = sf::read_sf("st_georges_cycle.geojson")
+# sample_area = sf::read_sf("sausage-boundary.geojson")
+sample_area = sf::st_transform(sample_area, "EPSG:27700")
+system.time({
+  mm_data_sample = mm_data_chars[sample_area, ]
+})
+sf::write_sf(mm_data_sample, "../internal/mm_data_sample_stgeorge.geojson")
+library(tmap)
+tmap_mode("view")
+n = names(mm_data_sample)
+n = n[-length(n)]
+head(mm_data_sample$minimumWidth)
+brks = c(0, 4, 8, 10, 12, 30)
+m = tm_shape(mm_data_sample) +
+  tm_lines(lwd = 4, col = "averageWidth", palette = "viridis", popup.vars = n, breaks = brks)
+m
+tmap_save(m, "sample_map_mm_stgeorge.html")
 ```
+
+That may not be the fastest read time in the world (QGIS is a bit faster at importing all 174 files) but unlike QGIS it results in a single object.
+Attempting to merge the layers in QGIS resulted in the following error:
+
+![](https://user-images.githubusercontent.com/122299965/229797085-e705279b-921b-43d9-863c-9ce9ab058f88.png)
+
+

@@ -27,8 +27,9 @@
 #' # unique(file_strings)
 #' files = mm_list(directory, pattern = "RoadLink")
 #' head(files)
-#' mm_data = mm_read(directory, pattern = "RoadLink")
-#' nrow(mm_data) # 46000
+#' mm_data_small = mm_read(directory, pattern = "RoadLink")
+#' nrow(mm_data_small) # 46000
+#' sf::st_write(mm_data_small, "mm_data_small.gpkg")
 #' names(mm_data)
 #' plot(mm_data$centrelineGeometry)
 #' # Multiple files
@@ -39,6 +40,8 @@
 mm_read = function(directory = ".", f = NULL, pattern = "Road_FULL", n_files = 1) {
   if (is.null(f)) {
     f = mm_list(directory, pattern, full.names = TRUE)
+    # Keep gz files:
+    f = f[grepl(pattern = ".gml.gz", x = f)]
     # Remove gfs files:
     f = f[!grepl(pattern = ".gfs|.properties", x = f)]
     message(length(f), " files available, starting with: ", f[1])

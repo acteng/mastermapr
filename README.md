@@ -36,3 +36,10 @@ system.time({
 })
 # saveRDS(mm_data, "mm_data_RoadLink.Rds")
 ```
+
+That may not be the fastest read time in the world (QGIS is a bit faster
+at importing all 174 files) but unlike QGIS it results in a single
+object. Attempting to merge the layers in QGIS resulted in the following
+error:
+
+![](https://user-images.githubusercontent.com/122299965/229797085-e705279b-921b-43d9-863c-9ce9ab058f88.png)
