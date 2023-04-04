@@ -30,10 +30,18 @@
 #' mm_data = mm_read(directory, pattern = "RoadLink")
 #' nrow(mm_data) # 46000
 #' names(mm_data)
+#' plot(mm_data$centrelineGeometry)
+#' # Multiple files
+#' mm_data = mm_read(directory, pattern = "RoadLink", n_files = 3)
+#' mm_data
+#' plot(mm_data$centrelineGeometry)
 #' }
 mm_read = function(directory = ".", f = NULL, pattern = "Road_FULL", n_files = 1) {
   if (is.null(f)) {
     f = mm_list(directory, pattern, full.names = TRUE)
+    # Remove gfs files:
+    f = f[!grepl(pattern = ".gfs|.properties", x = f)]
+    message(length(f), " files available, starting with: ", f[1])
     if(n_files < length(f)) {
       f = f[seq(n_files)]
     }
@@ -41,7 +49,10 @@ mm_read = function(directory = ".", f = NULL, pattern = "Road_FULL", n_files = 1
   if(length(f) == 1) {
     geo_data = sf::read_sf(f)
   } else {
-    stop("Reading multiple files not yet supported")
+    message("Reading in data")
+    geo_data_list = pbapply::pblapply(X = f, FUN = sf::read_sf)
+    message("Combining data")
+    geo_data = fastrbindsf(geo_data_list)
   }
   geo_data
 }
@@ -52,4 +63,22 @@ mm_read = function(directory = ".", f = NULL, pattern = "Road_FULL", n_files = 1
 mm_list = function(directory, pattern = "Road_FULL", full.names = FALSE) {
   f = list.files(directory, pattern = pattern, full.names = full.names)
   f
+}
+
+# See https://gist.github.com/kadyb/8a32c432a7b497b697379b483a8216d1
+# And https://github.com/r-spatial/sf/issues/798
+fastrbindsf = function(x, check = FALSE) {
+  if (length(x) == 0) stop("Empty list")
+  if (isTRUE(check)) {
+    ref_crs = sf::st_crs(x[[1]])
+    ref_colnames = colnames(x[[1]])
+    for (i in seq_len(length(x))) {
+      if (isFALSE(sf::st_crs(x[[i]]) == ref_crs)) stop("Diffrent CRS")
+      if (isFALSE(all(colnames(x[[i]]) == ref_colnames))) stop("Diffrent columns")
+    }
+  }
+  geom_name = attr(x[[1]], "sf_column")
+  x = collapse::unlist2d(x, idcols = FALSE, recursive = FALSE)
+  x[[geom_name]] = sf::st_sfc(x[[geom_name]], recompute_bbox = TRUE)
+  x = sf::st_as_sf(x)
 }

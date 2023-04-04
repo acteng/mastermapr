@@ -2,3 +2,4 @@
 ^\.Rproj\.user$
 ^\.devcontainer\.json$
 ^LICENSE\.md$
+^README\.Rmd$
