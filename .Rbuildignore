@@ -3,3 +3,4 @@
 ^\.devcontainer\.json$
 ^LICENSE\.md$
 ^README\.Rmd$
+^\.github$

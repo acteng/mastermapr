@@ -4,6 +4,8 @@
 # mastermapr
 
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/acteng/mastermapr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/acteng/mastermapr/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The goal of mastermapr is to make it easy to get your OS data imported
