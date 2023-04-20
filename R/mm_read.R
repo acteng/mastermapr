@@ -68,8 +68,15 @@ mm_list = function(directory, pattern = "Road_FULL", full.names = FALSE) {
   f
 }
 
-# See https://gist.github.com/kadyb/8a32c432a7b497b697379b483a8216d1
-# And https://github.com/r-spatial/sf/issues/798
+#' Rapidly bind sf data frames
+#' 
+#' See https://gist.github.com/kadyb/8a32c432a7b497b697379b483a8216d1
+#' And https://github.com/r-spatial/sf/issues/798
+#' 
+#' @param x List of sf data frames
+#' @param check Check that CRS and column names are the same?
+#' @return sf data frame
+#' @export
 fastrbindsf = function(x, check = FALSE) {
   if (length(x) == 0) stop("Empty list")
   if (isTRUE(check)) {

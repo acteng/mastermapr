@@ -45,8 +45,14 @@ files = mm_list(directory, pattern = "*")
 # unique(file_strings)
 files = mm_list(directory, pattern = "RoadLink")
 head(files)
-mm_data = mm_read(directory, pattern = "RoadLink")
-nrow(mm_data) # 46000
+mm_data_small = mm_read(directory, pattern = "RoadLink")
+nrow(mm_data_small) # 46000
+sf::st_write(mm_data_small, "mm_data_small.gpkg")
 names(mm_data)
+plot(mm_data$centrelineGeometry)
+# Multiple files
+mm_data = mm_read(directory, pattern = "RoadLink", n_files = 3)
+mm_data
+plot(mm_data$centrelineGeometry)
 }
 }
